@@ -2,7 +2,7 @@
   "name": "react-pixi-renderer",
   "version": "0.0.0-alpha",
   "description": "React Pixi Renderer",
-  "main": "index.js",
+  "main": "./dist/react-pixi-renderer.min.js",
   "scripts": {
     "clean": "rimraf ./dist",
     "dev": "cross-env BUILD_TYPE=dev node fuse.js",

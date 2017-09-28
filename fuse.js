@@ -36,6 +36,10 @@ if(Object.keys(BUILD).map(key => BUILD[key]).indexOf(buildType) === -1) {
 }
 console.log(`----------- building [${buildType}] --------`);
 
+if(buildType === BUILD.PRODUCTION) {
+    process.env.NODE_ENV = "production";
+}
+
 //create producer
 const fuse = FuseBox.init({
     homeDir: "src",
