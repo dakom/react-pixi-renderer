@@ -11,7 +11,7 @@ const updateBunnyPositions = (bunnies:Array<Bunny>) => ([stageWidth, stageHeight
     //movement is made to match https://github.com/pixijs/bunny-mark/blob/master/src/Bunny.js
     bunnies.map(oldBunny => {
         const bunny = Object.assign({}, oldBunny);
-        
+
         bunny.position.x += bunny.direction.x;
         bunny.position.y += bunny.direction.y;
         bunny.direction.y += 0.75;

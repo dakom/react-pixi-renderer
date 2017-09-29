@@ -6,7 +6,7 @@ import { updateBunnies } from './bunnies/Bunnies-Updater';
 import { WorldState } from './World-State';
 
 const _updateWorld = (ioDynamics:IoDynamics) => (worldState:WorldState):WorldState => 
-    Object.assign({}, worldState, {
+   Object.assign({}, worldState, {
         bunnies: updateBunnies (ioDynamics) (worldState),
         deltaTime: ioDynamics.deltaTime
     });
@@ -15,5 +15,5 @@ export const WorldUpdater = (ioDynamics:IoDynamics) => (worldState:WorldState):P
     (!worldState.texture) 
         ?   loadAssets(worldState)
         :   new Promise<WorldState>(resolve => {
-                resolve(_updateWorld(ioDynamics) (worldState));
+               resolve(_updateWorld(ioDynamics) (worldState));
             })
