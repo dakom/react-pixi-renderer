@@ -70,7 +70,8 @@ var ReactTypeOfSideEffect = {
   ContentReset: 16, //      0b00010000
   Callback: 32, //          0b00100000
   Err: 64, //               0b01000000
-  Ref: 128 };
+  Ref: 128 //              0b10000000
+};
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -88,7 +89,8 @@ var ReactPriorityLevel = {
   TaskPriority: 2, // Completes at the end of the current tick.
   HighPriority: 3, // Interaction that needs to complete pretty soon to feel responsive.
   LowPriority: 4, // Data fetching, or result from updating stores.
-  OffscreenPriority: 5 };
+  OffscreenPriority: 5 // Won't be visible but do the work in case it becomes visible.
+};
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.

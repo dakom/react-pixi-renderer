@@ -23,8 +23,8 @@ _it is *highly* recommended to use a bundler like fuse-box or webpack instead!_
 
 ## Usage
 
-1. Create a PIXI.Application. You must set `autoStart` to `false` 
-2. Call `ReactPixi.render(root, app)`
+1. Setup a PIXI.Application as usual
+2. Call `ReactPixi.render(rootElement, pixiContainer)`
 
 ## Code Sample
 
@@ -38,7 +38,7 @@ const app = new PIXI.Application({
     height: window.innerHeight, 
     backgroundColor: 0x2a2a2a,
     view: document.getElementById("canvas") as HTMLCanvasElement,
-    autoStart: false,
+    autoStart: true,
     });
 
 const World = () => (
@@ -47,9 +47,17 @@ const World = () => (
     </Container>
 )
 
-ReactPixi.render(<World />, app);
+ReactPixi.render(<World />, app.stage);
 
 ```
+
+## Manual rendering
+
+You can also set `autoStart: false` in the PIXI application and control rendering manually. 
+That requires one of two approaches:
+
+1. Providing the renderer as a callback (third param). For example: `ReactPixi.render(<World />, app.stage, app.render);` (CURRENTLY BROKEN - SEE https://github.com/facebook/react/issues/10950)
+2. Making the root element a Higher Order Component and lifting app.render there for lifecycle management (this works. see the [bunnymark source](https://github.com/dakom/react-pixi-renderer-bunnymark) for example)
 
 ## Components
 

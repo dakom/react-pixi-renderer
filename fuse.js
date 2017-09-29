@@ -19,8 +19,9 @@ const devPageTitle = "React Pixi Renderer";
 
 const BUILD = {
     DEV: "dev",
+    DEV_PRODUCTION: "dev:production",
     PLAIN: "build:plain",
-    PRODUCTION: "build:prod",
+    PRODUCTION: "build:production",
     TEST: "test-unit",
     
 }
@@ -36,13 +37,15 @@ if(Object.keys(BUILD).map(key => BUILD[key]).indexOf(buildType) === -1) {
 }
 console.log(`----------- building [${buildType}] --------`);
 
-if(buildType === BUILD.PRODUCTION) {
+const isProduction = (buildType === BUILD.PRODUCTION || buildType === BUILD.DEV_PRODUCTION)
+if(isProduction) {
     process.env.NODE_ENV = "production";
 }
 
 //create producer
 const fuse = FuseBox.init({
     homeDir: "src",
+    modulesFolder: "temp_modules",
     output: (buildType !== BUILD.PRODUCTION) ? `dist/$name.js` : `dist/$name.min.js`,
     target: "browser",
     useTypescriptCompiler : true,
@@ -50,19 +53,19 @@ const fuse = FuseBox.init({
     
     globals: (buildType === BUILD.TEST) ? undefined : { "react-pixi-renderer": "ReactPixi" },
     
-    sourceMaps: (buildType === BUILD.PRODUCTION) ? undefined : sourceMapStyle,
+    sourceMaps: (isProduction) ? undefined : sourceMapStyle,
     plugins: [
-        buildType === BUILD.PRODUCTION
+        isProduction
         && QuantumPlugin({
             removeUseStrict: false, //this magically fixed some weird quirks with react running before DOM mounting
             containedAPI: true,
             bakeApiIntoBundle: bundleName,
             treeshake: true,
             uglify: true,
-            target: "npm"
+            target: (buildType === BUILD.DEV_PRODUCTION) ? "browser" : "npm"
         }),
 
-        buildType === BUILD.DEV
+        (buildType === BUILD.DEV || buildType === BUILD.DEV_PRODUCTION)
         && WebIndexPlugin({
             title: devPageTitle,
             template: devStaticRoot + "/index.html",
@@ -77,6 +80,7 @@ const bundle = fuse.bundle(bundleName);
 if (buildType !== BUILD.TEST) {
     switch(buildType) {
         case BUILD.DEV:
+        case BUILD.DEV_PRODUCTION:
             bundle.instructions(`>dev/DevMain.tsx`);
             break;
         default:
@@ -88,7 +92,7 @@ if (buildType !== BUILD.TEST) {
 }
 
 //setup dev server
-if (buildType === BUILD.DEV) {
+if (buildType === BUILD.DEV || buildType === BUILD.DEV_PRODUCTION) {
     bundle
       .watch()
       .hmr();

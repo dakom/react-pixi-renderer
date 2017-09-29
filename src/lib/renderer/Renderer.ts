@@ -2,7 +2,7 @@ import { emptyObject } from 'fbjs/lib/emptyObject';
 import * as PIXI from 'pixi.js';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom'
-import * as ReactFiberReconciler from '../../temp-fb/FiberReconciler.production.js';
+import * as ReactFiberReconciler from 'react-reconciler';
 
 
 import { createElement } from '../elements/Elements';

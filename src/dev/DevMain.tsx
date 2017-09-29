@@ -1,11 +1,11 @@
-import * as PIXI from "pixi.js";
-import * as React from "react";
-import { ReactPixi } from "../lib/LibMain";
-import {worldUpdater} from "./app/world/World";
-import {withIo} from "./app/io/Io";
-import {View} from "./app/view/View";
+import * as PIXI from 'pixi.js';
+import * as React from 'react';
 
-const Instantiate = React.createElement;
+import { ReactPixi } from '../lib/LibMain';
+import { withIo } from './app/io/Io';
+import { WorldUpdater } from './app/world/World-Updater';
+import { WorldView } from './app/world/World-View';
+import {GetInitialWorldState} from "./app/world/World-State";
 
 const app = new PIXI.Application({
     width: window.innerWidth,
@@ -15,8 +15,6 @@ const app = new PIXI.Application({
     autoStart: false,
 });
 
-ReactPixi.render (
-    Instantiate(withIo (app) (worldUpdater) (View), {app: app}), 
-    app
-);
+const World = withIo (app) (WorldUpdater) (WorldView);
 
+ReactPixi.render (<World worldState={GetInitialWorldState()} />, app.stage);

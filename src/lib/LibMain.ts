@@ -1,39 +1,46 @@
 import * as React from 'react';
 import {Renderer} from "./renderer/Renderer";
 
-const c = name => props => React.createElement(name, props);
-
-export const Container = c('container');
-export const Text = c('text');
-export const Sprite = c('sprite');
-
+export * from "./components/components";
 
 export const ReactPixi = (function () {
     let container: any;
 
     return {
-        render: (element: React.Element<any>, app: PIXI.Application) => {
+        render: (element:any, pixiContainer:PIXI.Container, paintScreen?:() => void) => {
             if (!container) {
-                container = Renderer.createContainer(app.stage);
+                container = Renderer.createContainer(pixiContainer);
             }
 
-            console.log("updating...");
+            const doUpdate = () => {
+                Renderer.updateContainer(element, container);
+                if(paintScreen) {
+                    paintScreen();
+                }
+            }
+
+            //Kindof just assigning randomly to one of these for now
+
+            Renderer.batchedUpdates(() => {
+                console.log("batched updates...");
+            });
 
             Renderer.unbatchedUpdates(() => {
-                
-                Renderer.updateContainer(element, container);
-
-                app.render();
+                console.log("unbatched updates...");
             });
-        },
 
-        createPortal: (
-            children: ReactNodeList,
-            containerTag: number,
-            key: ?string = null,
-          ) => {
-            return ReactPortal.createPortal(children, containerTag, null, key);
-          },
+            Renderer.flushSync(() => {
+                console.log("flushing...");
+
+                doUpdate();
+            });
+
+            Renderer.deferredUpdates(() => {
+                console.log("deferred updates...");
+            });
+
+            
+        },
     }
 })();
 

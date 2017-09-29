@@ -1,11 +1,7 @@
 
 import * as PIXI from "pixi.js";
 import * as React from "react";
-import {WorldState, GetInitialWorldState} from "../world/World";
-
-interface IoProps {
-    app:PIXI.Application;
-}
+import {WorldState} from "../world/World-State";
 
 interface IoState {
     worldState: WorldState;
@@ -23,32 +19,23 @@ export interface IoDynamics {
 //A WorldUpdater must be supplied and checked all the way here at the top - otherwise the renderer has no way of knowing when its finished
 //It's written as a Higher Order Component so it can wrap around a React View
 export const withIo = (app:PIXI.Application) => (worldUpdater) => (ViewComponent) =>
-    class extends React.PureComponent<IoProps, any> {
-        private renderCompleted: boolean = true;
+    class extends React.PureComponent<IoState, IoState> {
+        private renderCompleted: boolean = false;
         private dynamics:IoDynamics;
 
-        constructor(props:IoProps) {
+        constructor(props) {
             super(props);
 
             this.dynamics = {
                 isTouching: false,
             }
-            this.state = {
-                worldState: GetInitialWorldState()
-            }
+            this.state = this.props;
 
             this.updateSize = this.updateSize.bind(this);
+            this.repaint = this.repaint.bind(this);
         }
 
-        updateSize() {
-            this.dynamics.stageWidth = window.innerWidth;
-            this.dynamics.stageHeight = window.innerHeight;
-            
-            this.props.app.view.setAttribute('width', window.innerWidth.toString());
-            this.props.app.view.setAttribute('height', window.innerHeight.toString());
-            this.props.app.renderer.resize(window.innerWidth,window.innerHeight);
-        }
-
+        /* Lifecycle */
         componentDidMount() {
             //Time
             const renderFrame = (frameNow) => {
@@ -73,27 +60,43 @@ export const withIo = (app:PIXI.Application) => (worldUpdater) => (ViewComponent
             requestAnimationFrame(renderFrame);
 
             //Input
-            this.props.app.renderer.plugins.interaction.on('pointerdown', () => {
+            app.renderer.plugins.interaction.on('pointerdown', () => {
                 console.log("Spawning bunnies!!");
                 this.dynamics.isTouching = true;
             });
-            this.props.app.renderer.plugins.interaction.on('pointerup', () => {
+            app.renderer.plugins.interaction.on('pointerup', () => {
                 this.dynamics.isTouching = false;
             });
 
             //Display
             window.onresize = evt => this.updateSize();
             this.updateSize();
+
+            //initial paint
+            this.repaint();
         }
 
         componentDidUpdate() {
-            //console.log(app.stage.children);
-            this.renderCompleted = true;
-            app.render();
-
-            
+            this.repaint();
         }
 
+        /* Utilities */
+
+        repaint() {
+            this.renderCompleted = true;
+            app.render();
+        }
+
+        updateSize() {
+            this.dynamics.stageWidth = window.innerWidth;
+            this.dynamics.stageHeight = window.innerHeight;
+            
+            app.view.setAttribute('width', window.innerWidth.toString());
+            app.view.setAttribute('height', window.innerHeight.toString());
+            app.renderer.resize(window.innerWidth,window.innerHeight);
+        }
+
+        /* Render tree */
         render() {
             return <ViewComponent {...this.state.worldState} />
         }
