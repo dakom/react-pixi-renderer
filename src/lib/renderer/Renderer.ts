@@ -2,15 +2,16 @@ import { emptyObject } from 'fbjs/lib/emptyObject';
 import * as PIXI from 'pixi.js';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom'
-import * as ReactFiberReconciler from '../../temp-fb/FiberReconciler.development';
+import * as ReactFiberReconciler from '../../temp-fb/FiberReconciler.production.js';
 
 
 import { createElement } from '../elements/Elements';
+import {filterPropChanges} from "../props/UpdateProps";
 
 
-const UPDATE_SIGNAL = {};
 
 const appendChild = (parentInstance: PIXI.Container, child: PIXI.DisplayObject) => {
+    //console.log("adding child", parentInstance, child);
 
     if (parentInstance.children.indexOf(child) !== -1) {
         parentInstance.removeChild(child);
@@ -19,10 +20,13 @@ const appendChild = (parentInstance: PIXI.Container, child: PIXI.DisplayObject) 
 }
 
 const removeChild = (parentInstance: PIXI.Container, child: PIXI.DisplayObject) => {
+    //console.log("removing child", parentInstance, child);
     parentInstance.removeChild(child);
 }
 
 const insertBefore = (parentInstance: PIXI.Container, child: PIXI.DisplayObject, beforeChild: PIXI.DisplayObject) => {
+    //console.log("swapping child", parentInstance, child);
+
     if (child !== beforeChild) {
         const index = parentInstance.children.indexOf(child);
         if (index !== -1) {
@@ -33,7 +37,7 @@ const insertBefore = (parentInstance: PIXI.Container, child: PIXI.DisplayObject,
     }
 }
 
-const Renderer = ReactFiberReconciler({
+export const Renderer = ReactFiberReconciler({
     createInstance(
         type,
         props,
@@ -41,6 +45,8 @@ const Renderer = ReactFiberReconciler({
         hostContext,
         internalInstanceHandle,
     ) {
+        //console.log("creating", type);
+
         return createElement(type, props, rootContainerInstance);
     },
 
@@ -68,19 +74,24 @@ const Renderer = ReactFiberReconciler({
         return false;
     },
 
-    prepareUpdate(testElement, type, oldProps, newProps, hostContext) {
-        //seems to be early diff tests to optionally prepare lists of changes or bail early
-        //Not sure yet exactly how it translates to what's seen in commitUpdate
-        return UPDATE_SIGNAL;
-    },
+    //seems to be early diff tests to optionally prepare lists of changes or bail early
+    //likely better to do work here than in commit
+    prepareUpdate: filterPropChanges,
+       
 
-    commitUpdate(instance: PIXI.DisplayObject, type, oldProps, newProps, rootContainerInstance, internalInstanceHandle) {
-        //TODO!
-        console.log("old props:", oldProps);
-        console.log("new props:", newProps);
-
-        console.log("updating?");
-
+    commitUpdate(instance: PIXI.DisplayObject, updatePayload, type, oldProps, newProps, rootContainerInstance, internalInstanceHandle) {
+        const keys = Object.keys(newProps);
+        keys
+            .forEach(key => {
+                
+                /*console.log("type", type);
+                
+                console.log("payload", updatePayload)
+                console.log("old", oldProps);
+                console.log("new", newProps);
+                */
+                instance[key] = newProps[key];
+            })
     },
 
 
@@ -94,6 +105,7 @@ const Renderer = ReactFiberReconciler({
     },
 
     resetAfterCommit() {
+        
         //e.g. maybe re-enable all event listeners
         //can also restore stashed metadata
     },
@@ -155,22 +167,4 @@ const Renderer = ReactFiberReconciler({
     useSyncScheduling: true,
 });
 
-export const ReactPixi = (function () {
-    let container: any;
 
-    return {
-        render: (element: React.Element<any>, app: PIXI.Application) => {
-            if (!container) {
-                container = Renderer.createContainer(app.stage);
-            }
-
-            Renderer.unbatchedUpdates(() => {
-                console.log("updating...");
-                Renderer.updateContainer(element, container);
-
-                console.log(app.stage.children);
-                app.render();
-            });
-        }
-    }
-})();

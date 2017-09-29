@@ -8,7 +8,6 @@
         "preserveConstEnums": true,
         "target": "es5",
         "jsx": "react",
-        "allowJs": true,
         "lib": [
             "es6",
             "es5",

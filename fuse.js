@@ -26,7 +26,7 @@ const BUILD = {
 }
 
 const buildType = process.env.BUILD_TYPE;
-const staticRoot = "./src/dev";
+const devStaticRoot = "./src/dev/static";
 const sourceMapStyle = { inline: false };
 
 //sanity check
@@ -54,16 +54,18 @@ const fuse = FuseBox.init({
     plugins: [
         buildType === BUILD.PRODUCTION
         && QuantumPlugin({
+            removeUseStrict: false, //this magically fixed some weird quirks with react running before DOM mounting
+            containedAPI: true,
             bakeApiIntoBundle: bundleName,
             treeshake: true,
             uglify: true,
-            target: "browser"
+            target: "npm"
         }),
 
         buildType === BUILD.DEV
         && WebIndexPlugin({
             title: devPageTitle,
-            template: staticRoot + "/index.html",
+            template: devStaticRoot + "/index.html",
             path: "."
         })
     ]
@@ -92,7 +94,7 @@ if (buildType === BUILD.DEV) {
       .hmr();
     fuse.dev({ open: true }, server => {
         const app = server.httpServer.app;
-        app.use("/static/", express.static(staticRoot));
+        app.use("/static/", express.static(devStaticRoot));
     });
 }
 

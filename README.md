@@ -5,7 +5,7 @@
 
 # IMPORTANT - THIS IS CURRENTLY AN EARLY-STAGE ALPHA BUILD. NOT READY FOR PUBLIC CONSUMPTION YET
 
-## [Live Demo](https://dakom.github.io/react-pixi-renderer-bunnymark) - [Source](https://github.com/dakom/react-pixi-renderer-bunnymark)
+## [Demo](https://github.com/dakom/react-pixi-renderer-bunnymark)
 
 ## How to Install
 
@@ -15,7 +15,7 @@ NPM
 
 CDN (external browser)
 
-`<script src="https://cdn.jsdelivr.net/npm/react-pixi-renderer/dist/react-pixi-renderer.min.js"></script>`
+`<script src="//unpkg.com/react-pixi-renderer/dist/react-pixi-renderer.min.js"></script>`
 
 _note: if loading externally, everything will be on globals via `ReactPixi`. e.g. ReactPixi.ReactPixi, ReactPixi.Text, ReactPixi.Container, etc_
 _additionally, since JSX requires transpilation, you'll need to use the string keys for each component. See [src/tests/external-browser](src/tests/external-browser) for example._
