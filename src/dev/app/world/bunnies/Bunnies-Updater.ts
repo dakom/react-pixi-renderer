@@ -1,5 +1,4 @@
 import {WorldState} from "../World-State";
-import {IoDynamics} from "../../io/Io";
 import {generateBunnies} from "./Bunnies-Generator";
 import {Bunny} from "./Bunnies-Data";
 
@@ -40,7 +39,7 @@ const updateBunnyPositions = (bunnies:Array<Bunny>) => ([stageWidth, stageHeight
         return bunny;
     })
 
-export const updateBunnies = (ioDynamics:IoDynamics) => (worldState:WorldState):Array<Bunny> => {
-    const bunnies = ioDynamics.isTouching ? addBunnies(worldState.bunnies) : worldState.bunnies;
-    return updateBunnyPositions (bunnies) ([ioDynamics.stageWidth, ioDynamics.stageHeight])
+export const updateBunnies = (worldState:WorldState):Array<Bunny> => {
+    const bunnies = worldState.ioDynamics.isTouching ? addBunnies(worldState.bunnies) : worldState.bunnies;
+    return updateBunnyPositions (bunnies) ([worldState.ioDynamics.stageWidth, worldState.ioDynamics.stageHeight])
 }

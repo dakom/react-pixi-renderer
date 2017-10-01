@@ -1,16 +1,21 @@
+
+const TRANSFORM_KEYS = ["x", "y", "width", "height", "rotation"];
+
 const TYPE_KEYS = {
-    container: [],
-    text: ["text", "style"],
-    sprite: ["texture"]
+    container: [].concat(TRANSFORM_KEYS),
+    text: ["text", "style"].concat(TRANSFORM_KEYS),
+    sprite: ["texture"].concat(TRANSFORM_KEYS)
 }
 
-const ALL_KEYS = ["x", "y", "width", "height", "scaleX", "scaleY", "rotation"];
+export const filterPropKey = type => (key):boolean => {
+    return TYPE_KEYS[type].indexOf(key) !== -1;
+}
 
-export const filterPropChanges = (testElement, type, oldProps, newProps, hostContext) => {
+export const prepPropChanges = (testElement, type, oldProps, newProps, hostContext) => {
     
-    const keysToCheck = ALL_KEYS.concat(TYPE_KEYS[type]);
+    const keyFilter = filterPropKey(type)
 
-    const keysToChange =  Object.keys(newProps).filter(key => keysToCheck.indexOf(key) !== -1);
+    const keysToChange =  Object.keys(newProps).filter(keyFilter);
 
     if(keysToChange.length) {
         const retObj = {};

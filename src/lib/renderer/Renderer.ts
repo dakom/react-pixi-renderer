@@ -6,9 +6,10 @@ import * as ReactFiberReconciler from 'react-reconciler';
 
 
 import { createElement } from '../elements/Elements';
-import {filterPropChanges} from "../props/UpdateProps";
+import {prepPropChanges, filterPropKey} from "../props/UpdateProps";
 
 
+const UPDATE_SIGNAL = {};
 
 const appendChild = (parentInstance: PIXI.Container, child: PIXI.DisplayObject) => {
     //console.log("adding child", parentInstance, child);
@@ -74,27 +75,44 @@ export const Renderer = ReactFiberReconciler({
         return false;
     },
 
-    //seems to be early diff tests to optionally prepare lists of changes or bail early
-    //likely better to do work here than in commit
-    prepareUpdate: filterPropChanges,
-       
+
+    //prepareUpdate seems to want to take advantage of async updates
+    //both options are possible, though it seems option 2 is actually faster for our needs
+
+    //OPTION 1 - use prepare update to filter changes then just apply in commit
+    /*
+    prepareUpdate: prepPropChanges,
 
     commitUpdate(instance: PIXI.DisplayObject, updatePayload, type, oldProps, newProps, rootContainerInstance, internalInstanceHandle) {
-        const keys = Object.keys(newProps);
-        keys
+        Object.keys(updatePayload)
             .forEach(key => {
-                
-                /*console.log("type", type);
-                
-                console.log("payload", updatePayload)
-                console.log("old", oldProps);
-                console.log("new", newProps);
-                */
-                instance[key] = newProps[key];
-            })
+                instance[key] = updatePayload[key];
+            });
+    },
+    */
+
+    
+    //option 2 - let everything pass through prep, and then filter in commit
+    prepareUpdate() {
+        return UPDATE_SIGNAL
     },
 
+    commitUpdate(instance: PIXI.DisplayObject, updatePayload, type, oldProps, newProps, rootContainerInstance, internalInstanceHandle) {
+        
+        const keys = Object.keys(newProps)
+        .filter(filterPropKey(type))
+        .forEach(key => {        
+                instance[key] = newProps[key];
+        })
+    },
 
+    /*
+     * Prioritization - maybe return true if object is visually hidden
+     */
+
+    shouldDeprioritizeSubtree() {
+        return false;
+    },
     /*
      * Global side effects between commits
      */
@@ -164,7 +182,7 @@ export const Renderer = ReactFiberReconciler({
     },
 
     //In the future, turn this off ;)
-    useSyncScheduling: true,
+    useSyncScheduling: false,
 });
 
 

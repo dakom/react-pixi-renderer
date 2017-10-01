@@ -18,7 +18,7 @@ export interface IoDynamics {
 //Grabs all current Input/Output values and passes them down on frame ticks (if not busy with a previous render)
 //A WorldUpdater must be supplied and checked all the way here at the top - otherwise the renderer has no way of knowing when its finished
 //It's written as a Higher Order Component so it can wrap around a React View
-export const withIo = (app:PIXI.Application) => (worldUpdater) => (ViewComponent) =>
+export const withIo = (app:PIXI.Application) => (worldUpdater) => (World) =>
     class extends React.PureComponent<IoState, IoState> {
         private renderCompleted: boolean = false;
         private dynamics:IoDynamics;
@@ -46,8 +46,13 @@ export const withIo = (app:PIXI.Application) => (worldUpdater) => (ViewComponent
                     this.dynamics.deltaTime = this.dynamics.tick ? frameNow - this.dynamics.tick : 0;
                     this.dynamics.tick = frameNow;
                     
-                   
-                    worldUpdater (this.dynamics) (this.state.worldState)
+                    //merge io dynamics into old world
+                    const worldState = Object.assign({}, {
+                        ioDynamics: this.dynamics
+                    }, this.state.worldState);
+
+                    //update world
+                    worldUpdater (worldState)
                         .then(newWorld => {
                             this.setState({
                                 worldState: newWorld
@@ -98,6 +103,6 @@ export const withIo = (app:PIXI.Application) => (worldUpdater) => (ViewComponent
 
         /* Render tree */
         render() {
-            return <ViewComponent {...this.state.worldState} />
+            return <World {...this.state.worldState} />
         }
     }

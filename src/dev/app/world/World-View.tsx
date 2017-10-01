@@ -11,9 +11,8 @@ export const WorldView = props =>
             ?   <Text text={(props.texture) ? "ready!" :  "loading..."} style={{fill: 0xFF00FF}} />
             :   <Container>
                     <Bunnies texture={props.texture} bunnies={props.bunnies} /> 
-                    <Status deltaTime={props.deltaTime} bunnies={props.bunnies} />
+                    <Status deltaTime={props.ioDynamics.deltaTime} bunnies={props.bunnies} stageWidth={props.ioDynamics.stageWidth} />
                 </Container>
         }
-        
     </Container>
     
