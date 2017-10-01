@@ -61,6 +61,7 @@ const fuse = FuseBox.init({
         isProduction
         && QuantumPlugin({
             removeUseStrict: false, //this magically fixed some weird quirks with react running before DOM mounting
+            globalRequire: false,
             containedAPI: true,
             bakeApiIntoBundle: bundleName,
             treeshake: true,
