@@ -3,9 +3,8 @@ const app = new PIXI.Application({
     height: window.innerHeight, 
     backgroundColor: 0x2a2a2a,
     view: document.getElementById("canvas"),
-    autoStart: false,
+    autoStart: true,
     });
-
 
 const e = React.createElement;
 
@@ -19,4 +18,4 @@ const World =
         })
     );
 
-ReactPixi.ReactPixi.render(World, app);
+ReactPixi.ReactPixi.render(World, app.stage);

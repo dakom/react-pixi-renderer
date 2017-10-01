@@ -3,7 +3,7 @@
  */
 const path = require('path');
 const express = require('express');
-const { FuseBox, QuantumPlugin, WebIndexPlugin } = require("fuse-box");
+const { EnvPlugin, FuseBox, QuantumPlugin, WebIndexPlugin } = require("fuse-box");
 
 /*
  * Config
@@ -55,6 +55,9 @@ const fuse = FuseBox.init({
     
     sourceMaps: (isProduction) ? undefined : sourceMapStyle,
     plugins: [
+
+        EnvPlugin({ BUILD_TYPE: buildType, NODE_ENV: isProduction ? "production" : process.env.NODE_ENV}),
+        
         isProduction
         && QuantumPlugin({
             removeUseStrict: false, //this magically fixed some weird quirks with react running before DOM mounting
