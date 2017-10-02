@@ -25,7 +25,7 @@
     "chai": "^4.1.2",
     "cross-env": "5.0.5",
     "fbjs": "^0.8.16",
-    "fuse-box": "^2.2.3-beta.19",
+    "fuse-box": "2.3.1-beta.21",
     "fuse-test-runner": "1.0.14",
     "live-server": "^1.2.0",
     "object-assign": "4.1.1",
