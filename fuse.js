@@ -19,16 +19,17 @@ const devPageTitle = "React Pixi Renderer";
 
 const BUILD = {
     DEV: "dev",
-    DEV_PRODUCTION: "dev:production",
-    PLAIN: "build:plain",
-    PRODUCTION: "build:production",
+    DEV_PRODUCTION: "dev-production",
+    PLAIN: "build-plain",
+    PRODUCTION: "build-production",
+    BROWSER_PRODUCTION: "build-browser-production",
+    BROWSER_PLAIN: "build-browser-plain",
     TEST: "test-unit",
     
 }
 
 const buildType = process.env.BUILD_TYPE;
 const devStaticRoot = "./src/dev/static";
-const sourceMapStyle = { inline: false };
 
 //sanity check
 if(Object.keys(BUILD).map(key => BUILD[key]).indexOf(buildType) === -1) {
@@ -37,73 +38,104 @@ if(Object.keys(BUILD).map(key => BUILD[key]).indexOf(buildType) === -1) {
 }
 console.log(`----------- building [${buildType}] --------`);
 
-const isProduction = (buildType === BUILD.PRODUCTION || buildType === BUILD.DEV_PRODUCTION)
-if(isProduction) {
-    process.env.NODE_ENV = "production";
-}
+/* Common props between all targets */
+const outputType = buildType.replace("build-", "").replace("plain", "dev");
 
-//create producer
-const fuse = FuseBox.init({
+const commonFuseProps = {
+    output: `dist/$name.${outputType}.js`,
     homeDir: "src",
     modulesFolder: "temp_modules",
-    output: (buildType !== BUILD.PRODUCTION) ? `dist/$name.js` : `dist/$name.min.js`,
     target: "browser",
     useTypescriptCompiler : true,
-    package: (buildType === BUILD.TEST) ? undefined : "react-pixi-renderer",
-    
-    globals: (buildType === BUILD.TEST) ? undefined : { "react-pixi-renderer": "ReactPixi" },
-    
-    sourceMaps: (isProduction) ? undefined : sourceMapStyle,
-    plugins: [
+}
 
-        EnvPlugin({ BUILD_TYPE: buildType, NODE_ENV: isProduction ? "production" : process.env.NODE_ENV}),
+/* Setup NODE_ENV and pass it through */
+const nodeEnv = 
+    (buildType === BUILD.PRODUCTION || buildType === BUILD.DEV_PRODUCTION || buildType === BUILD.BROWSER_PRODUCTION)
+        ? "production"
+        : process.env.NODE_ENV;
+
+process.env.NODE_ENV = nodeEnv;
+
+const commonPlugins = [ EnvPlugin({ BUILD_TYPE: buildType, NODE_ENV: nodeEnv}) ]
+
+/* Per-target props */
+
+let fuseProps = (() => {
+    switch(buildType) {
+        case BUILD.PLAIN:
+        case BUILD.BROWSER_PLAIN:
+        case BUILD.DEV:
+            return ({
+                sourceMaps: { inline: false },
+            })
+        case BUILD.PRODUCTION:
+        case BUILD.BROWSER_PRODUCTION:
+        case BUILD.DEV_PRODUCTION:
+            return ({
+                plugins: [
+                    QuantumPlugin({
+                        removeUseStrict: false,
+                        globalRequire: false,
+                        containedAPI: true,
+                        bakeApiIntoBundle: bundleName,
+                        treeshake: true,
+                        uglify: true,
+                        target: (buildType === BUILD.BROWSER_PRODUCTION || buildType === BUILD.DEV_PRODUCTION) ? "browser" : "npm"
+                    })
+                ]
+            })
+        default:
+            return ({});
+    }
         
-        isProduction
-        && QuantumPlugin({
-            removeUseStrict: false, //this magically fixed some weird quirks with react running before DOM mounting
-            globalRequire: false,
-            containedAPI: true,
-            bakeApiIntoBundle: bundleName,
-            treeshake: true,
-            uglify: true,
-            target: (buildType === BUILD.DEV_PRODUCTION) ? "browser" : "npm"
-        }),
+})();
 
-        (buildType === BUILD.DEV || buildType === BUILD.DEV_PRODUCTION)
-        && WebIndexPlugin({
+if(buildType !== BUILD.TEST) {
+    fuseProps.package = "react-pixi-renderer";
+    fuseProps.globals = { "react-pixi-renderer": "ReactPixi" };
+}
+
+if(buildType === BUILD.DEV || buildType === BUILD.DEV_PRODUCTION) {
+    const webPlugins = [
+        WebIndexPlugin({
             title: devPageTitle,
             template: devStaticRoot + "/index.html",
             path: "."
         })
-    ]
-});
+    ];
+    fuseProps.plugins = fuseProps.plugins ? fuseProps.plugins.concat(webPlugins) : webPlugins;
+}
+
+//Mix it all in
+fuseProps.plugins = fuseProps.plugins ? fuseProps.plugins.concat(commonPlugins) : commonPlugins;
+
+fuseProps = Object.assign(commonFuseProps, fuseProps);
+
+//create producer
+const fuse = FuseBox.init(Object.assign(commonFuseProps, fuseProps));
 
 //create bundle
 const bundle = fuse.bundle(bundleName);
 
-if (buildType !== BUILD.TEST) {
-    switch(buildType) {
-        case BUILD.DEV:
-        case BUILD.DEV_PRODUCTION:
-            bundle.instructions(`>dev/DevMain.tsx`);
-            break;
-        default:
-            bundle.instructions(`>lib/LibMain.ts`);
-            break;
-    }
-} else {
-    bundle.test("[tests/unit/**/**.test.ts]");
-}
-
-//setup dev server
-if (buildType === BUILD.DEV || buildType === BUILD.DEV_PRODUCTION) {
-    bundle
-      .watch()
-      .hmr();
-    fuse.dev({ open: true }, server => {
-        const app = server.httpServer.app;
-        app.use("/static/", express.static(devStaticRoot));
-    });
+switch(buildType) {
+    case BUILD.TEST:
+        bundle.test("[tests/unit/**/**.test.ts]");
+        break;
+    case BUILD.DEV:
+    case BUILD.DEV_PRODUCTION:
+        bundle
+            .instructions(`>dev/DevMain.tsx`)
+            .watch()
+            .hmr();
+        fuse.dev({ open: true }, server => {
+            const app = server.httpServer.app;
+            app.use("/static/", express.static(devStaticRoot));
+        });
+        break;
+    default:
+        bundle.instructions(`>[lib/LibMain.ts]`);
+        break;
 }
 
 //go!

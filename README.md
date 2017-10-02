@@ -7,17 +7,24 @@
 
 ## How to Install
 
-NPM
+### NPM
 
 `npm install react-pixi-renderer`
 
-CDN (external browser)
+### CDN
 
-`<script src="//unpkg.com/react-pixi-renderer/dist/react-pixi-renderer.min.js"></script>`
+`<script src="//unpkg.com/react-pixi-renderer/dist/react-pixi-renderer.browser-production.js"></script>`
 
-_note: if loading externally, everything will be on globals via `ReactPixi`. e.g. ReactPixi.ReactPixi, ReactPixi.Text, ReactPixi.Container, etc_
-_additionally, since JSX requires transpilation, you'll need to use the string keys for each component. See [src/tests/external-browser](src/tests/external-browser) for example._
-_it is *highly* recommended to use a bundler like fuse-box or webpack instead!_
+_Everything will be on globals via `ReactPixi` e.g. ReactPixi.ReactPixi, ReactPixi.Text, ReactPixi.Container, etc_
+
+### DEPENDENCIES
+
+The library is stripped of dependencies since it only makes sense in an environment that already has PIXI and React loaded.
+
+However, there is an additional package `react-reconciler` which is currently waiting for a [PR merge](https://github.com/facebook/react/pull/10758).
+
+For now, it's included here in `temp_modules` and you must import that in the consuming app as well.
+
 
 ## Usage
 
@@ -51,15 +58,16 @@ ReactPixi.render(<World />, app.stage);
 
 ## Manual rendering
 
-You can also set `autoStart: false` in the PIXI application and control rendering manually. 
-That requires one of two approaches:
+You can also set `autoStart: false` in the PIXI application and control rendering manually. This is likely the more ideal setup for anything that will potentially take more than 1 frame of execution.
+
+It requires one of two approaches:
 
 1. Providing the renderer as a callback (third param). For example: `ReactPixi.render(<World />, app.stage, app.render);` (WIP - SEE https://github.com/facebook/react/issues/10950)
 2. Making the root element a Higher Order Component and lifting app.render there for lifecycle management (this works. see the [bunnymark source](https://github.com/dakom/react-pixi-renderer-bunnymark) for example)
 
 ## Components
 
-See the currently available components at [docs/Components](docs/Components.md)
+The currently available components are documented at [docs/Components](docs/Components.md)
 
 The overall approach is to match the native PIXI object props 1:1
 
@@ -70,7 +78,6 @@ If a feature cannot be expressed inherently through _both_ React props and nativ
 An example of that could be a Triangle component (which is really a series of calls on a PIXI.Graphics object), or getting measurements that are calculated post-mounting (or rather, after an onAdded event).
 
 The bulk of the remaining work is simply copy/paste adding support for more components and filling the remaining properties. The links will bring you to the official PIXI docs for the native objects. PRs that add this in are welcome :)
-
 
 ## Building, Testing, Roadmap, etc.
 
