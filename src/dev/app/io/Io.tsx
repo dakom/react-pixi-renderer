@@ -2,7 +2,7 @@
 import * as PIXI from "pixi.js";
 import * as React from "react";
 import {WorldState} from "../world/World-State";
-
+import {LogInfo} from "./Log";
 interface IoState {
     worldState: WorldState;
 }
@@ -40,11 +40,11 @@ export const withIo = (app:PIXI.Application) => (worldUpdater) => (World) =>
             //Time
             const renderFrame = (frameNow) => {
                 if (this.renderCompleted) {
-                    
+                    const now = performance.now(); //better for metrics than framenow
                     this.renderCompleted = false;
 
-                    this.dynamics.deltaTime = this.dynamics.tick ? frameNow - this.dynamics.tick : 0;
-                    this.dynamics.tick = frameNow;
+                    this.dynamics.deltaTime = this.dynamics.tick ? now - this.dynamics.tick : 0;
+                    this.dynamics.tick = now;
                     
                     //merge io dynamics into old world
                     const worldState = Object.assign({}, {
@@ -73,6 +73,11 @@ export const withIo = (app:PIXI.Application) => (worldUpdater) => (World) =>
                 this.dynamics.isTouching = false;
             });
 
+            document.onkeyup = e => {
+                if(e.keyCode === 32) {
+                    LogInfo (app) (this.state.worldState);
+                }
+            }
             //Display
             window.onresize = evt => this.updateSize();
             this.updateSize();

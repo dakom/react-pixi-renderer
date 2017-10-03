@@ -31,6 +31,7 @@ const getText = ({ text, style, canvas, ...props }): PIXI.Text => {
     return new PIXI.Text(text, style, canvas);
 }
 
+
 export const createElement = (type, props, rootContainerInstance: PIXI.Application) => 
     wrapDisplayObject(props) (
         (() => {
@@ -38,7 +39,8 @@ export const createElement = (type, props, rootContainerInstance: PIXI.Applicati
                 case "container": return new PIXI.Container();
                 case "graphics": return new PIXI.Graphics();
                 case "text": return getText(props);
-                case "sprite": return getSprite(props);
+                case "sprite": 
+                    return getSprite(props);
                 default: //console.log("UNKNOWN TYPE!", type); 
                     return type;
             }

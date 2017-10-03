@@ -6,13 +6,13 @@ import * as ReactFiberReconciler from 'react-reconciler';
 
 
 import { createElement } from '../elements/Elements';
-import {prepPropChanges, filterPropKey} from "../props/UpdateProps";
+import {prepPropChanges, filterPropKey, applyPayload} from "../props/UpdateProps";
 
 
 const UPDATE_SIGNAL = {};
 
 const appendChild = (parentInstance: PIXI.Container, child: PIXI.DisplayObject) => {
-    //console.log("adding child", parentInstance, child);
+    //console.log("adding child", child.constructor.name);
 
     if (parentInstance.children.indexOf(child) !== -1) {
         parentInstance.removeChild(child);
@@ -21,12 +21,12 @@ const appendChild = (parentInstance: PIXI.Container, child: PIXI.DisplayObject) 
 }
 
 const removeChild = (parentInstance: PIXI.Container, child: PIXI.DisplayObject) => {
-    //console.log("removing child", parentInstance, child);
+    //console.log("removing child", child.constructor.name);
     parentInstance.removeChild(child);
 }
 
 const insertBefore = (parentInstance: PIXI.Container, child: PIXI.DisplayObject, beforeChild: PIXI.DisplayObject) => {
-    //console.log("swapping child", parentInstance, child);
+    //console.log("swapping child", parentInstance.constructor.name, child.constructor.name);
 
     if (child !== beforeChild) {
         const index = parentInstance.children.indexOf(child);
@@ -84,10 +84,7 @@ export const Renderer = ReactFiberReconciler({
     prepareUpdate: prepPropChanges,
 
     commitUpdate(instance: PIXI.DisplayObject, updatePayload, type, oldProps, newProps, rootContainerInstance, internalInstanceHandle) {
-        Object.keys(updatePayload)
-            .forEach(key => {
-                instance[key] = updatePayload[key];
-            });
+        applyPayload (type) (instance) (updatePayload)
     },
     
     /*

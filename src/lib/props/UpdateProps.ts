@@ -13,6 +13,7 @@ export const filterPropKey = type => (key):boolean => {
 
 export const prepPropChanges = (testElement, type, oldProps, newProps, hostContext) => {
     
+
     const keyFilter = filterPropKey(type)
 
     const keysToChange =  Object.keys(newProps).filter(keyFilter);
@@ -26,4 +27,12 @@ export const prepPropChanges = (testElement, type, oldProps, newProps, hostConte
     }
 
     return false;
+}
+
+export const applyPayload = type => instance => payload => {
+    
+    Object.keys(payload)
+    .forEach(key => {
+        instance[key] = payload[key];
+    });
 }
