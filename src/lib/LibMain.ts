@@ -12,14 +12,12 @@ export const ReactPixi = (function () {
                 container = Renderer.createContainer(pixiContainer);
             }
 
-            const doUpdate = () => {
-                Renderer.updateContainer(element, container);
-                if(paintScreen) {
-                    paintScreen();
-                }
+            /*const doUpdate = () => {
+                
             }
-
+*/
             //Kindof just assigning randomly to one of these for now
+            //See https://github.com/facebook/react/issues/10950
 
             Renderer.batchedUpdates(() => {
                 console.log("batched updates...");
@@ -31,8 +29,7 @@ export const ReactPixi = (function () {
 
             Renderer.flushSync(() => {
                 console.log("flushing...");
-
-                doUpdate();
+                Renderer.updateContainer(element, container, undefined, paintScreen);
             });
 
             Renderer.deferredUpdates(() => {
