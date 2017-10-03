@@ -80,7 +80,7 @@ export const Renderer = ReactFiberReconciler({
     //both options are possible, though it seems option 2 is actually faster for our needs
 
     //OPTION 1 - use prepare update to filter changes then just apply in commit
-    /*
+    
     prepareUpdate: prepPropChanges,
 
     commitUpdate(instance: PIXI.DisplayObject, updatePayload, type, oldProps, newProps, rootContainerInstance, internalInstanceHandle) {
@@ -89,9 +89,8 @@ export const Renderer = ReactFiberReconciler({
                 instance[key] = updatePayload[key];
             });
     },
-    */
-
     
+    /*
     //option 2 - let everything pass through prep, and then filter in commit
     prepareUpdate() {
         return UPDATE_SIGNAL
@@ -105,7 +104,7 @@ export const Renderer = ReactFiberReconciler({
                 instance[key] = newProps[key];
         })
     },
-
+*/
     /*
      * Prioritization - maybe return true if object is visually hidden
      */
