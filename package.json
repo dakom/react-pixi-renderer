@@ -1,6 +1,6 @@
 {
   "name": "react-pixi-renderer",
-  "version": "0.0.8-alpha",
+  "version": "0.0.9-alpha",
   "description": "React Pixi Renderer",
   "main": "./dist/react-pixi-renderer.production.js",
   "scripts": {

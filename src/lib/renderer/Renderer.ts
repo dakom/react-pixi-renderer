@@ -182,7 +182,7 @@ export const Renderer = ReactFiberReconciler({
     },
 
     //In the future, turn this off ;)
-    useSyncScheduling: false,
+    useSyncScheduling: true,
 });
 
 
