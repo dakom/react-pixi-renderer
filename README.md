@@ -79,6 +79,14 @@ An example of that could be a Triangle component (which is really a series of ca
 
 The bulk of the remaining work is simply copy/paste adding support for more components and filling the remaining properties. The links will bring you to the official PIXI docs for the native objects. PRs that add this in are welcome :)
 
+## Gotchas
+
+Compared to straight PIXI, performance kindof sucks if you use it for lots of nodes. See this test/demo that tries to figure out where the bottleneck is: https://dakom.github.io/react-renderer-test/
+
+It turns out that the bottleneck is basically React itself and the size of the tree. So don't use this approach for lots of items! However - I get a solid framerate for like <4000 bunnies on desktop.
+
+If performance is an issue for lots of items, and you still want to go this route, you can squeeze more juice out of it by constructing the architecture so that the edge nodes render null rather than proper elements, though that means ditching the inherent pipeline and managing your own objects. That technique can work with any renderer and using ReactDOM vs. this custom renderer does not see a significant difference, so there's no real point in using this renderer if you go that route (on other words, if you do this - the bulk of the work is then inside your renderer-agnostic components)
+
 ## Building, Testing, Roadmap, etc.
 
 See [docs](docs/)
