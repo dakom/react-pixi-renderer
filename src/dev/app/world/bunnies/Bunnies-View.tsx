@@ -3,6 +3,8 @@ import * as React from "react";
 import {Text, Container, Sprite} from "../../../../lib/LibMain";
 import {Bunny} from "./Bunnies-Data";
 
+console.log(Sprite);
+
 export const Bunnies = ({texture, bunnies}) => 
 (
     <Container>

@@ -14,6 +14,7 @@ export const filterPropKey = type => (key):boolean => {
 export const prepPropChanges = (testElement, type, oldProps, newProps, hostContext) => {
     
 
+    //console.log(newProps);
     const keyFilter = filterPropKey(type)
 
     const keysToChange =  Object.keys(newProps).filter(keyFilter);
