@@ -1,6 +1,6 @@
 # Components
 
-All DisplayObject components have the following props:
+## All DisplayObject components have the following props:
 
 ### [x](http://pixijs.download/dev/docs/PIXI.DisplayObject.html#x):number
 ### [y](http://pixijs.download/dev/docs/PIXI.DisplayObject.html#y):number
@@ -14,7 +14,7 @@ All DisplayObject components have the following props:
 ### [onRemoved](http://pixijs.download/dev/docs/PIXI.DisplayObject.html#event:added):(child:PIXI.DisplayObject, parent:PIXI.Container)
 
 
-The following are the list of components, with their additional props
+## Component List
 
 ### [Container](http://pixijs.download/dev/docs/PIXI.Container.html)
 
