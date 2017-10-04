@@ -62,8 +62,10 @@ You can also set `autoStart: false` in the PIXI application and control renderin
 
 It requires one of two approaches:
 
-1. Providing the renderer as a callback (third param). For example: `ReactPixi.render(<World />, app.stage, app.render);` (WIP - SEE https://github.com/facebook/react/issues/10950)
-2. Making the root element a Higher Order Component and lifting app.render there for lifecycle management (this works. see the [bunnymark source](https://github.com/dakom/react-pixi-renderer-bunnymark) for example)
+1. Making the root element a Higher Order Component and lifting app.render there to run via lifecycle management, e.g. componentDidUpdate. See the [here](src/dev/app/io/Io.tsx) for example)
+
+2. ([wip](https://github.com/facebook/react/issues/10950) - not working yet) Providing the renderer as a callback (third param). For example: `ReactPixi.render(<World />, app.stage, app.render);`
+
 
 ## Components
 
