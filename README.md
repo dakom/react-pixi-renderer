@@ -3,7 +3,7 @@
 # React Pixi Renderer
 ## A React Fiber Renderer for PIXI
 
-## [Demo](https://github.com/dakom/react-pixi-renderer-bunnymark)
+## [Demo](https://dakom.github.io/react-renderer-test/)
 
 ## How to Install
 
